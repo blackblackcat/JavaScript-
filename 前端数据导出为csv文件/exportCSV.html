@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script type="text/javascript" src="Blob.js"></script>
+    <script type="text/javascript" src="FileSaver.js"></script>
+</head>
+<body>
+<textarea rows="6" style="width:80%" id="content">
+姓名,学号,成绩
+王三,103020120,98
+张四,103020218,80
+</textarea>
+
+<input type="button" id="exportBtn" value="export"/>
+</body>
+<script type="text/javascript">
+    //此函数用于格式化每一个单元格，
+    function format(str){
+        if(!str){
+            return "";
+        }
+        str += "";  //若为数字，则转成String
+        var quot = '"';
+        if(/[,\r\n]/g.test(str)){
+            str = quot + str.replace(/(")/g,'""') + quot ;
+            //前后引号，作为整个字符处理。
+            //存在双引号时，需双写引号，csv定义。
+        }
+        return str;
+    }
+    document.getElementById("exportBtn").onclick = function(event){
+        event.preventDefault();
+        var BB = self.Blob;
+        var context = document.getElementById("content").value;
+        var testquot = '双引号"测试';
+        context += "\n" +format("逗号,测试") + ","+ format("回车\n测试") + "," + format(testquot);
+        saveAs(
+                new BB(
+                        ["\ufeff" + context] //\ufeff防止utf8 bom防止中文乱码
+                        , {type: "text/plain;charset=utf8"}
+                )
+                , "filename.cvs"
+        );
+    };
+</script>
+</html>
